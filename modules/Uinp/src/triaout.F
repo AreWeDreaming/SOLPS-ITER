@@ -1,17 +1,7 @@
       subroutine triaout(filename)
-      use b2mod_types
-      use b2mod_layer
-     , , only: ntrack, nalloys
-      use eirmod_solps
-#ifdef DIMENSIONS_MODULE
-      use b2mod_dimensions
-#endif
-
-c  version : 17.03.2005 00:03
-
 CVK output data for Triang grid (file header)
+      use uinput_mod
       implicit none
-#include "uinput.inc"
       integer :: i
       character*(*) filename
       open(iunoo,file=filename)

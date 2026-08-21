@@ -107,6 +107,8 @@ endif
 
 VPATH = ${SRCDIR}
 
+$(shell awk 'FNR==1{if(!/^OBJS *=/){e=1;exit}} END{exit e}' \
+        ${OBJDIR}/LISTOBJ 2>/dev/null || rm -f ${OBJDIR}/LISTOBJ)
 ifeq ($(shell [ -e ${OBJDIR}/LISTOBJ ] && echo yes || echo no ),yes)
 include ${OBJDIR}/LISTOBJ
 endif
@@ -126,14 +128,24 @@ endif
 
 $(OBJDIR)/%.o : %.F
 	${CPP} -P ${INCLUDE} ${SOLPS_CPP} ${DEFINES} ${USE_DEBUG} $< ${OBJDIR}/$*.f
-	$(COMPILE) ${INCLUDE} ${FFLAGSEXTRA} -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f
+	$(COMPILE) ${INCLUDE} ${FFLAGSEXTRA} -I${OBJDIR} -o ${OBJDIR}/$*.o ${OBJDIR}/$*.f
+	@if [ -f $*.${MOD} ] ; then /bin/mv $*.${MOD} ${OBJDIR}/ ; fi
+
+ifneq (${MOD},o)
+# The compiler writes the .mod file as a side effect of producing the .o,
+# so make .mod depend on .o (no recipe).  This avoids a parallel-make race
+# where the duplicate "%.${MOD}: %.F" rule and the "%.o: %.F" rule above
+# would both compile the same source concurrently and clobber the .mod.
+$(OBJDIR)/%.${MOD} : $(OBJDIR)/%.o
+	@true
+endif
 
 all: VERSION ${OBJDIR}/${PROG} ${OBJDIR}/ub2p
 
 .PHONY: clean depend listobj tags echo VERSION force
 
-${OBJDIR}/${PROG}: ${OBJDIR}/uinput.o ${OBJDIR}/uiblkd.o ${OBJDIR}/uiblb2.o ${OBJDIR}/libui.a ${MNEXTRA} ${MAKES}
-	${FC} $(FFLAGS) ${FFLAGSEXTRA} -o ${OBJDIR}/${PROG} ${OBJDIR}/uinput.o ${OBJDIR}/uiblkd.o ${OBJDIR}/uiblb2.o ${OBJDIR}/libui.a ${MNEXTRA} ${LDLIBS} $(LDEXTRA)
+${OBJDIR}/${PROG}: ${OBJDIR}/uinput.o ${OBJDIR}/libui.a ${MNEXTRA} ${MAKES}
+	${FC} $(FFLAGS) ${FFLAGSEXTRA} -o ${OBJDIR}/${PROG} ${OBJDIR}/uinput.o ${OBJDIR}/libui.a ${MNEXTRA} ${LDLIBS} $(LDEXTRA)
 
 ${OBJDIR}/ub2p: ${OBJDIR}/ub2p.o ${OBJDIR}/libui.a ${OBJDIR}/libb25.a ${MAKES}
 	${FC} $(FFLAGS) ${FFLAGSEXTRA} -o ${OBJDIR}/ub2p ${OBJDIR}/ub2p.o ${OBJDIR}/libui.a ${OBJDIR}/libb25.a ${LDLIBS} $(LDEXTRA)
@@ -146,7 +158,7 @@ ${OBJDIR}/libb25.a: ${DIMENSIONS} ${B2OBJ}/b2mod_constants.o ${B2OBJ}/b2mod_b2cm
 	@ar rucv $@ ${DIMENSIONS} ${B2OBJ}/b2mod_constants.o ${B2OBJ}/b2mod_b2cmpa.o ${B2OBJ}/b2mod_elements.o ${B2OBJ}/b2mod_stack.o ${B2OBJ}/b2mod_types.o ${B2OBJ}/b2mod_layer.o ${B2OBJ}/b2mod_math.o ${B2OBJ}/b2mod_openmp.o ${B2OBJ}/b2mod_solpstop.o ${B2OBJ}/chcase.o ${B2OBJ}/helper.o ${B2OBJ}/ifill.o ${B2OBJ}/b2mod_ipmain.o ${B2OBJ}/isadigit.o ${B2OBJ}/isplusorminus.o ${B2OBJ}/len_of_digits.o ${B2OBJ}/lower_case.o ${B2OBJ}/b2mod_lwimai.o ${B2OBJ}/b2mod_lwmain.o ${B2OBJ}/machsfr.o ${B2OBJ}/nagsubst.o ${B2OBJ}/open_file.o ${B2OBJ}/prgend.o ${B2OBJ}/prgini.o ${B2OBJ}/prvrt.o ${B2OBJ}/prvrti.o ${B2OBJ}/ratio.o ${B2OBJ}/sfill.o ${B2OBJ}/streql.o ${B2OBJ}/strip_spaces.o ${B2OBJ}/b2mod_subsys.o ${B2OBJ}/sysend.o ${B2OBJ}/sysini.o ${B2OBJ}/xerrab.o ${B2OBJ}/b2mod_xerset.o ${B2OBJ}/xertst.o ${B2OBJ}/xxdata_11.o
 	ranlib $@
 
-${OBJDIR}/uinput.o: ${OBJDIR}/uiblkd.o
+${OBJDIR}/uinput.o:
 
 ifneq (${MOD},o)
 ${OBJDIR}/b2mod_dimensions.${MOD}:
@@ -261,7 +273,7 @@ ifneq (${MOD},o)
 	rm -f ${OBJDIR}/*.${MOD}
 endif
 
-depend: ${OBJS:.o=.F} uiblkd.F uinput.F uiblb2.F ub2p.F ${SRCDIR}/git_version_Uinp.h
+depend: ${OBJS:.o=.F} uinput.F ub2p.F ${SRCDIR}/git_version_Uinp.h
 	@`which makedepend` -p'$${OBJDIR}/' ${SOLPS_CPP} ${USE_DEBUG} ${DEFINES} -f- ${INCLUDE} $^ | \
 	sed 's,^$${OBJDIR}/[^ ][^ ]*/,\$${OBJDIR}/,' | \
 	sed 's,: ${SOLPSTOP},: $${SOLPSTOP},' > ${OBJDIR}/dependencies.${COMPILER}
@@ -271,7 +283,7 @@ depend: ${OBJS:.o=.F} uiblkd.F uinput.F uiblb2.F ub2p.F ${SRCDIR}/git_version_Ui
 listobj:
 	@cd ${SRCDIR} ; rm -f ${OBJDIR}/LISTOBJ; touch ${OBJDIR}/LISTOBJ; \
 	echo "OBJS =" *.F | sed -e 's/ [^ /]*\// /g' -e 's/\.F/.o/g' | \
-	sed -e 's/ub2p\.o//' -e 's/uinput\.o//' -e 's/uiblkd\.o//' -e 's/uiblb2\.o//' > ${OBJDIR}/LISTOBJ
+	sed -e 's/ub2p\.o//' -e 's/uinput\.o//' > ${OBJDIR}/LISTOBJ
 
 tags:
 	rm -f ${BASEDIR}/TAGS ; ${MAKETAGS} ${BASEDIR}/TAGS ${SRCDIR}/*.F ${SRCDIR}/*.h ${SRCDIR}/*.inc || touch ${BASEDIR}/TAGS
@@ -281,16 +293,17 @@ ${OBJDIR}/LISTOBJ: listobj
 VERSION: ${SRCDIR}/git_version_Uinp.h
 
 ${SRCDIR}/git_version_Uinp.h: force
-	@echo "      character*32 :: git_version_Uinp =" > ${SRCDIR}/git_version_new.h
-	@echo "     . '`git describe --tags --dirty --always | cut -c 1-32`'" >> ${SRCDIR}/git_version_new.h
-	@if cmp -s ${SRCDIR}/git_version_new.h ${SRCDIR}/git_version_Uinp.h; then rm ${SRCDIR}/git_version_new.h; else mv ${SRCDIR}/git_version_new.h ${SRCDIR}/git_version_Uinp.h; fi
+	@echo "      character*32 :: git_version_Uinp =" > ${OBJDIR}/git_version_new.h
+	@echo "     . '`git describe --tags --dirty --always | cut -c 1-32`'" >> ${OBJDIR}/git_version_new.h
+	@if cmp -s ${OBJDIR}/git_version_new.h ${SRCDIR}/git_version_Uinp.h; then rm ${OBJDIR}/git_version_new.h; else mv ${OBJDIR}/git_version_new.h ${SRCDIR}/git_version_Uinp.h; fi
 
 ${OBJDIR}/dependencies.${COMPILER}:
 	-mkdir -p ${OBJDIR}
-	touch ${OBJDIR}/dependencies.${COMPILER}
+	printf '# Dummy dependencies file for Uinp\n' > ${OBJDIR}/dependencies.${COMPILER}
 	${MAKE} listobj
 	${MAKE} depend
 
+$(shell [ -s ${OBJDIR}/dependencies.${COMPILER} ] || rm -f ${OBJDIR}/dependencies.${COMPILER})
 include ${OBJDIR}/dependencies.${COMPILER}
 ifeq ($(shell [ -e ${SRCUIN}/config/dependencies.local ] && echo yes || echo no ),yes)
 include ${SRCUIN}/config/dependencies.local

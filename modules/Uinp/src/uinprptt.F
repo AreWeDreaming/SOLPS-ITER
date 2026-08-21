@@ -1,11 +1,5 @@
       subroutine uinprptt(lc)
-      use b2mod_types
-      use b2mod_layer
-     , , only: ntrack, nalloys
-      use eirmod_solps
-#ifdef DIMENSIONS_MODULE
-      use b2mod_dimensions
-#endif
+      use uinput_mod
 c
 c  version : 01.04.2005 00:25
 c
@@ -14,7 +8,6 @@ c*** Prepare the data for the test Eirene run
 c=======================================================================
       implicit none
       logical lc
-#include "uinput.inc"
       integer :: i,k,ntcpu_b,nfile_b,i1trc_b,i2trc_b,npts_b(nstra),
      ,  mpts_b(nstra),isyplt_b(8),nptc_b(nstep),nptcm_b(nstep)
       real alloc_b
