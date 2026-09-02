@@ -25,10 +25,9 @@ then
         LmodError("SOLPS-ITER can only be loaded from tcsh.")
     end
 end
-setenv("CRAY_ADD_RPATH", "yes")
-append_path("LD_LIBRARY_PATH", os.getenv("CRAY_LD_LIBRARY_PATH"))
 
 depends_on("cray-hdf5")
+depends_on("cray-pmi")
 depends_on("cray-netcdf")
 conflict("conda")
 
@@ -68,7 +67,7 @@ setenv("CONDA_DEFAULT_ENV", "solps_env")
 append_path("PATH", conda_env_path.."/bin")
 
 setenv("NCARG_ROOT", os.getenv("CONDA_PREFIX"))
-prepend_path("PKG_CONFIG_PATH", pathJoin(conda_env_path, "lib", "pkgconfig"))
+append_path("PKG_CONFIG_PATH", pathJoin(conda_env_path, "lib", "pkgconfig"))
 
 setenv("SOLPS_LIB", AppPath .. "lib")
 source_sh("tcsh", pathJoin(AppPath, "SETUP/setup.csh.NERSC.cray"))
