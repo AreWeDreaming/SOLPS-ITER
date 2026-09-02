@@ -1,0 +1,17 @@
+name: solps_env
+channels:
+  - conda-forge
+dependencies:
+  # NCAR Command language
+  - ncl
+  
+  # Motif
+  - openmotif
+
+  # Python
+  - python
+  - netCDF4
+  - numpy
+  - scipy
+  - matplotlib
+  
