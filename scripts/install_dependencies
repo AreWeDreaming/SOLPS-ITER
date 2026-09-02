@@ -1930,7 +1930,7 @@ if ( ! -e "${SOLPSTOP}/lib/${HOST_NAME}.${COMPILER}/gr/libgr.a" ) then   # Check
     if ("$OSTYPE" == "linux") then
       sed -i 's/^all: libgr.a install$/all: libgr.a/' Makefile
       sed -i '/^install: libgr.a$/,/^  cp libgr.a $(SOLPS_LIB)$/d' Makefile
-      if ("$COMPILER" == "gfortran") then
+      if ("$COMPILER" == "gfortran" -o "$HOST_NAME" == "NERSC") then
         cat <<EOF >> Makefile
 linux.gfortran:
 	@make all F77="gfortran" \\
