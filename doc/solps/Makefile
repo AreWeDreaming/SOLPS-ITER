@@ -165,7 +165,7 @@ SOLPS_versions: force
 	@if cmp -s SOLPS_versions_new SOLPS_versions ; then rm SOLPS_versions_new ; else mv SOLPS_versions_new SOLPS_versions ; fi
 
 solps-iter_git.log: ${MAKES}
-	( cd ${SOLPSTOP} ; ${GIT} log --oneline | sed -e "s:ü:ue:g" -e "s:ö:oe:g" ) > solps-iter_git.log
+	( cd ${SOLPSTOP} ; ${GIT} log --oneline | sed -e "s:ü:ue:g" -e "s:ö:oe:g" | iconv -f UTF-8 -t ASCII//TRANSLIT -c ) > solps-iter_git.log
 
 update_log: solps-iter_git.log
 
