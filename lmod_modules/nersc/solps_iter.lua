@@ -96,7 +96,7 @@ setenv("SOLPSWORK", pathJoin("/global/cfs/cdirs/m3739/solps-results/", os.getenv
 -- Hack conda source replacement here
 setenv("CONDA_PREFIX", conda_env_path)
 setenv("CONDA_DEFAULT_ENV", "solps_env")
-append_path("PATH", conda_env_path.."/bin")
+append_path("PATH", pathJoin(conda_env_path,"bin"))
 
 -- setenv() above does not update os.getenv(), so reading CONDA_PREFIX back here
 -- returned the pre-module value (usually nil). Use the literal.
@@ -112,5 +112,5 @@ append_path("PKG_CONFIG_PATH", pathJoin(conda_env_path, "lib", "pkgconfig"))
 setenv("SOLPSLIB", solpslib)
 if(mode() == "load")
 then
-    source_sh("tcsh", pathJoin(AppPath, "SETUP/setup.csh.NERSC.gfortran"))
+    source_sh("tcsh", pathJoin(AppPath, "SETUP", "setup.csh.NERSC.gfortran"))
 end
