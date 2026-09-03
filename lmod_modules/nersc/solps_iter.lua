@@ -79,7 +79,11 @@ setenv("NCDIR", netcdf_dir)
 setenv("H5DIR", hdf5_dir)
 
 setenv("HOST_NAME", "NERSC")
-setenv("COMPILER", "cray")
+-- COMPILER names the Fortran compiler family, not the wrapper: every config.*.cray
+-- in the tree carries CCE flags (-e0 -ez -ef -hfp3 -K trap=divz) that gfortran
+-- rejects. PrgEnv-gnu means gfortran, driven through the ftn/cc wrappers set above,
+-- which is exactly what the config.*.gfortran files already expect.
+setenv("COMPILER", "gfortran")
 local conda_root = "/global/common/software/nersc/pe/conda/26.1.0/Miniforge3-25.11.0-1/"
 setenv("CONDA_ROOT", conda_root)
 
@@ -88,7 +92,7 @@ setenv("CONDA_ROOT", conda_root)
 
 setenv("SYSNAME", "x86_64_rhel8")
 setenv("HOSTNAME", "NERSC")
-setenv("TOOLCHAIN", "cray")
+setenv("TOOLCHAIN", "gfortran")
 
 setenv(string.upper(AppName) .. "_DIR", AppPath)
 setenv("SOLPSTOP", AppPath)
@@ -108,5 +112,5 @@ append_path("PKG_CONFIG_PATH", pathJoin(conda_env_path, "lib", "pkgconfig"))
 setenv("SOLPS_LIB", AppPath .. "lib")
 if(mode() == "load")
 then
-    source_sh("tcsh", pathJoin(AppPath, "SETUP/setup.csh.NERSC.cray"))
+    source_sh("tcsh", pathJoin(AppPath, "SETUP/setup.csh.NERSC.gfortran"))
 end
