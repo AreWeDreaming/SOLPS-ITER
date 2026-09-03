@@ -30,7 +30,7 @@ LD_NCARG   = -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -L/usr/lib64 -lX1
 
 # SOLPSLIB is ${SOLPSTOP}/lib/${HOST_NAME}.${COMPILER}, so these follow the
 # toolchain automatically instead of pinning a NERSC.<compiler> directory.
-LIBJSON = ${SOLPSLIB}/json-fortran-9.0.2/lib
+LIBJSON = ${CONDA_PREFIX}/lib
 MSCL_ROOT = ${SOLPSLIB}/mscl/lib
 LD_MSCL = -L${MSCL_ROOT} -lmscl
 GLI_HOME = ${SOLPSLIB}/gli/src/gks
