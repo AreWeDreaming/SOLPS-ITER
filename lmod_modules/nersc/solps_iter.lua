@@ -100,11 +100,16 @@ append_path("PATH", conda_env_path.."/bin")
 
 -- setenv() above does not update os.getenv(), so reading CONDA_PREFIX back here
 -- returned the pre-module value (usually nil). Use the literal.
+local solpslib = pathJoin(AppPath, "lib", "NERSC.gfortran")
 setenv("NCARG_ROOT", conda_env_path)
-setenv("LibJSON", pathJoin(conda_env_path, "lib"))
+
+-- unclear why these are not derived from SOLPSLIB
+setenv("LibGRS", pathJoin(solpslib, "gr"))
+setenv("LibGKS", pathJoin(solpslib, "gli", "src", "gks"))
+
 append_path("PKG_CONFIG_PATH", pathJoin(conda_env_path, "lib", "pkgconfig"))
 
-setenv("SOLPSLIB", pathJoin(AppPath, "lib", "NERSC.gfortran"))
+setenv("SOLPSLIB", solpslib)
 if(mode() == "load")
 then
     source_sh("tcsh", pathJoin(AppPath, "SETUP/setup.csh.NERSC.gfortran"))
