@@ -36,7 +36,6 @@ end
 
 
 depends_on("cray-hdf5")
-depends_on("cray-pmi")
 depends_on("cray-netcdf")
 conflict("conda")
 

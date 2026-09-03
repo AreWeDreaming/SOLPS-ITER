@@ -26,12 +26,16 @@
 #
 
 LD_NETCDF  = -L${NCDIR}/lib -lnetcdff
-LD_MSCL    = -L${MSCL_ROOT}/lib -lmscl -Wl,-rpath=${MSCL_ROOT}/lib
-LD_GR      = -L${GR_ROOT}/lib -lgr -Wl,-rpath=${GR_ROOT}/lib
-LD_GKS     = -L${GLI_DIR} -lgks -Wl,-rpath=${GLI_DIR}/lib
-LD_NCARG   = -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -L/usr/lib64 -lX11 -lm -lcairo -lfreetype -Wl,-rpath=${MKLROOT}/lib/intel64
-LD_NAG     = -L${MKLROOT}/lib/intel64 -lmkl_intel_ilp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lm -ldl
-LD_MDSPLUS = #-L${MDSPLUS_DIR}/lib -lMdsLib_client
+LD_NCARG   = -L${NCARG_ROOT}/lib -lncarg -lncarg_gks -lncarg_c -L/usr/lib64 -lX11 -lm -lcairo -lfreetype
+
+LIBJSON = ${SOLPSTOP}/lib/NERSC.cray/json-fortran-9.0.2/lib
+MSCL_ROOT = ${SOLPSTOP}/lib/NERSC.cray/mscl/lib
+LD_MSCL = -L${SOLPSTOP}/lib/NERSC.cray/mscl/lib -lmscl
+GLI_HOME = ${SOLPSTOP}/lib/NERSC.cray/gli/src/gks
+LD_GKS = -L${SOLPSTOP}/lib/NERSC.cray/gli/src/gks -lgks
+GR_ROOT = ${SOLPSTOP}/lib/NERSC.cray/gr
+LD_GR = -L${SOLPSTOP}/lib/NERSC.cray/gr -lgr
+
 LD_SONNET  = -lsonnet -lstdc++
 
 #
