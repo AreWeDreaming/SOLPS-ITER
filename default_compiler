@@ -61,7 +61,7 @@ case "ENEA":
   echo pgf90
   breaksw
 case "NERSC":
-  echo cray
+  echo gfortran
   breaksw
 default:
   echo ifort64

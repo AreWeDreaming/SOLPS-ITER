@@ -79,11 +79,6 @@ setenv("NCDIR", netcdf_dir)
 setenv("H5DIR", hdf5_dir)
 
 setenv("HOST_NAME", "NERSC")
--- COMPILER names the Fortran compiler family, not the wrapper: every config.*.cray
--- in the tree carries CCE flags (-e0 -ez -ef -hfp3 -K trap=divz) that gfortran
--- rejects. PrgEnv-gnu means gfortran, driven through the ftn/cc wrappers set above,
--- which is exactly what the config.*.gfortran files already expect.
-setenv("COMPILER", "gfortran")
 local conda_root = "/global/common/software/nersc/pe/conda/26.1.0/Miniforge3-25.11.0-1/"
 setenv("CONDA_ROOT", conda_root)
 
