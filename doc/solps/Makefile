@@ -211,11 +211,11 @@ CONTRIBUTING.tex: ${SOLPSTOP}/CONTRIBUTING.md
 
 Old_packages.tex: ${MAKES}
 ifeq ($(shell test ${LATEX_VERSION} -lt 2015; echo $$?),0)
-	echo "\usepackage{fixltx2e}" > Old_packages.tex
+	echo "\usepackage{fixltx2e}" > Old_packages.tex.tmp
 else
-	@- rm -f Old_packages.tex
-	touch Old_packages.tex
+	touch Old_packages.tex.tmp
 endif
+	mv -f Old_packages.tex.tmp Old_packages.tex
 
 SOLPS_versions: force
 	@( cd ${SOLPSTOP} ; git describe --tags --always | awk '{print "SOLPS-ITER version : ",$$1}' ) > SOLPS_versions_new
