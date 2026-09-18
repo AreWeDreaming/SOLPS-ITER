@@ -34,7 +34,7 @@ end
 -- entry on unload, and this variable grows as the depends_on modules below load,
 -- so load and unload would disagree and leave debris in LD_LIBRARY_PATH.
 
-
+depends_on("texlive")
 depends_on("cray-hdf5")
 depends_on("cray-netcdf")
 conflict("conda")
@@ -110,6 +110,14 @@ setenv("LibGKS", pathJoin(solpslib, "gli", "src", "gks"))
 append_path("PKG_CONFIG_PATH", pathJoin(conda_env_path, "lib", "pkgconfig"))
 
 setenv("SOLPSLIB", solpslib)
+
+-- I would really like to avoid these and rather link them in with --rpath but it does not seem easy
+append_path("LD_LIBRARY_PATH", pathJoin(solpslib,"mscl","lib"))
+
+append_path("LD_LIBRARY_PATH", pathJoin(netcdf_dir, "lib"))
+
+append_path("LD_LIBRARY_PATH", pathJoin(conda_env_path, "lib"))
+
 if(mode() == "load")
 then
     source_sh("tcsh", pathJoin(AppPath, "SETUP", "setup.csh.NERSC.gfortran"))
