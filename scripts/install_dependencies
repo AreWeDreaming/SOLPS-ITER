@@ -1943,20 +1943,6 @@ linux.gfortran:
 	BLDFLAG="ar cr"
 EOF
         make linux.gfortran
-      else if ("$COMPILER" == "cray") then
-        cat <<EOF >> Makefile
-linux.cray:
-	@make all F77="ftn" \\
-  CC="cc" \\
-	CFLAGS="-std=gnu17 -Wno-implicit-int -Wno-implicit-function-declaration" \\
-	F77FLAGS="-O3 -std=legacy -fdefault-real-8 -fno-range-check -fallow-argument-mismatch -ffree-line-length-0" \\
-	F90="ftn" \\
-	F90FLAGS="-O3 -std=legacy -fdefault-real-8 -fno-range-check -fallow-argument-mismatch -ffree-line-length-0" \\
-	F90OBJS="" \\
-	RANLIB="echo" \\
-	BLDFLAG="ar cr"
-EOF
-        make linux.cray
       else
         make linux.${COMPILER}
       endif
