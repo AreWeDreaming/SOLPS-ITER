@@ -51,6 +51,7 @@ case "JFRS":
 case "LINUX":
 case "MARCONI":
 case "MEPHI":
+case "NERSC":
 case "ORNL":
 case "PITAGORA":
 case "PPPL":
@@ -59,9 +60,6 @@ case "WM":
   breaksw
 case "ENEA":
   echo pgf90
-  breaksw
-case "NERSC":
-  echo gfortran
   breaksw
 default:
   echo ifort64
