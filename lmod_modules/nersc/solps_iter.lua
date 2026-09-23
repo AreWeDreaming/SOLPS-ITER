@@ -63,6 +63,9 @@ setenv("F77", "ftn")
 setenv("CC", "cc")
 setenv("CXX", "CC")
 
+-- b2run -m "mpiexec -n N" swaps the launcher for SOLPS_MPIRUN, keeping its arguments
+setenv("SOLPS_MPIRUN", "srun")
+
 local netcdf_dir = env_or({"NETCDF_DIR", "CRAY_NETCDF_PREFIX"}, "")
 local hdf5_dir   = env_or({"HDF5_DIR", "CRAY_HDF5_PREFIX"}, "")
 
