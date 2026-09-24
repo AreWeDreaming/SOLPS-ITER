@@ -13,8 +13,7 @@ dependencies:
 
   # Python
   - python
-  - netCDF4
-  - netcdf-fortran
+  - netcdf4
   - numpy
   - scipy
   - matplotlib
