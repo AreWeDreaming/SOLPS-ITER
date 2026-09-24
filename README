@@ -252,7 +252,7 @@ and compares the results with the reference runs. Build the flavor first:
     mpi_openmp : make solps_openmp_mpi
 
 Then run the script from an empty work directory outside of $SOLPSTOP, e.g.
-    mkdir ~/solps_test && cd ~/solps_test
+    mkdir <SCRATCH>/solps_test && cd <SCRATCH>/solps_test
     $SOLPSTOP/scripts/SOLPS-ITER_test openmp
 
 The test cases are downloaded into the work directory and the script exits with
