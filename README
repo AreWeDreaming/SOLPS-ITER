@@ -269,8 +269,10 @@ Then run the script from an empty work directory outside of $SOLPSTOP, e.g.
     mkdir <SCRATCH>/solps_test && cd <SCRATCH>/solps_test
     $SOLPSTOP/scripts/SOLPS-ITER_test openmp
 
-The test cases are downloaded into the work directory and the script exits with
-a non-zero status if a comparison fails.
+The test case tarballs are downloaded into the work directory once and reused
+by later runs as long as they match their MD5 hash. The extracted case
+directories are deleted and re-extracted on every run, so each test starts from
+a clean state. The script exits with a non-zero status if a comparison fails.
 
 On a shared system, request an interactive job on a compute node and run the
 script there rather than on a login node.

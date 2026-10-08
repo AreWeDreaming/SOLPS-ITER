@@ -52,13 +52,19 @@ endsw
 # Do not abort on globs without matches (rm *.prt)
 set nonomatch
 
+# Each case is extracted fresh from its tarball; leftovers from earlier runs
+# are deleted first so intermediate files never carry over.  The tarballs
+# themselves are kept in the work directory and reused by the examples
+# Makefile while they match their MD5 hash.
+
 set workdir = ${cwd}
 set examples = ${SOLPSTOP}/runs/examples/Makefile
 set checks = ${SOLPSTOP}/modules/B2.5/src/test
 set stamp = `datestamp`
 
 if ($flavor == debug) then
-  make -f ${examples} AUG_16151_D+C+He
+  rm -rf AUG_16151_D+C+He AUG_16151_D+C+He.tmp
+  make -f ${examples} AUG_16151_D+C+He || exit 1
   cd AUG_16151_D+C+He
   setenv DEVICE upgrade
   cd baserun
@@ -86,10 +92,16 @@ if ($flavor == openmp) then
   set omp_steps   = (10 10 100 100)
   set omp_threads = (6 4 6 7)
   set omp_devices = (upgrade upgrade iter iter)
+  set prev_case = ""
   @ i = 1
   while ($i <= $#omp_cases)
     cd ${workdir}
-    make -f ${examples} ${omp_cases[$i]}
+    # Consecutive entries of the same case share one extraction
+    if (${omp_cases[$i]} != ${prev_case}) then
+      rm -rf ${omp_cases[$i]} ${omp_cases[$i]}.tmp
+      make -f ${examples} ${omp_cases[$i]} || exit 1
+    endif
+    set prev_case = ${omp_cases[$i]}
     cd ${omp_cases[$i]}
     setenv DEVICE ${omp_devices[$i]}
     correct_baserun_timestamps
@@ -134,7 +146,8 @@ if ($flavor == mpi || $flavor == mpi_openmp) then
   else
     set thread_counts = (1 4)
   endif
-  make -f ${examples} ITER_2360_0.95He+0.05H_40MW
+  rm -rf ITER_2360_0.95He+0.05H_40MW ITER_2360_0.95He+0.05H_40MW.tmp
+  make -f ${examples} ITER_2360_0.95He+0.05H_40MW || exit 1
   cd ITER_2360_0.95He+0.05H_40MW
   setenv DEVICE iter
   correct_baserun_timestamps

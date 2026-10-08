@@ -3,6 +3,9 @@
 # Shared asset directory is possible on ITER cluster
 EXTERNALDATA ?= https://zenodo.org/records/22868737
 
+# Location of the *.md5 files, also when called with -f from another directory
+EXAMPLESDIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+
 HASHES := $(wildcard *.md5)
 ASSETS = $(HASHES:%.md5=%)
 
@@ -13,10 +16,19 @@ all : $(ASSETS)
 
 % :
 	@echo $*
-	@rm -f $*.tar.gz
-	wget ${EXTERNALDATA}/files/$*.tar.gz
-	mkdir $*.tmp ; tar -xhmzf $*.tar.gz -C $*.tmp
-	[ `echo $*.tmp/* | wc -w` == 1 ] && (mv $*.tmp/$* . ; rm -Rf $*.tmp) || (mv $*.tmp $*)
+# Reuse a previously downloaded tarball if it matches its MD5 hash.  Download
+# to a temporary name so an interrupted download is never mistaken for a
+# complete one.
+	@if [ -f $*.tar.gz ] && echo "`cat ${EXAMPLESDIR}$*.tar.gz.md5`  $*.tar.gz" | md5sum --check --status; then \
+	  echo "Reusing $*.tar.gz"; \
+	else \
+	  rm -f $*.tar.gz $*.tar.gz.part && \
+	  wget -O $*.tar.gz.part ${EXTERNALDATA}/files/$*.tar.gz && \
+	  mv $*.tar.gz.part $*.tar.gz; \
+	fi
+	rm -Rf $*.tmp
+	mkdir $*.tmp && tar -xhmzf $*.tar.gz -C $*.tmp
+	if [ `echo $*.tmp/* | wc -w` = 1 ]; then mv $*.tmp/$* . && rm -Rf $*.tmp; else mv $*.tmp $*; fi
 
 clean:
 	rm -f $(ASSETS)
