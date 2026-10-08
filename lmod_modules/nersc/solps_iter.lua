@@ -35,23 +35,7 @@ end
 -- so load and unload would disagree and leave debris in LD_LIBRARY_PATH.
 
 depends_on("texlive")
-depends_on("cray-hdf5")
-depends_on("cray-netcdf")
 conflict("conda")
-
--- os.getenv() in a modulefile reads the environment as it was when Lmod started,
--- so variables published by the depends_on modules above are not reliably visible
--- here, and are looked up again when the module is unloaded. Every lookup needs a
--- deterministic fallback or `module reload` will not mirror what the load did.
-local function env_or(names, fallback)
-    for i = 1, #names do
-        local v = os.getenv(names[i])
-        if v ~= nil and v ~= "" then
-            return v
-        end
-    end
-    return fallback
-end
 
 -- setup compiler variables
 -- The craype wrappers are on PATH via PrgEnv, so naming them directly keeps load
@@ -66,20 +50,10 @@ setenv("CXX", "CC")
 -- b2run -m "mpiexec -n N" swaps the launcher for SOLPS_MPIRUN, keeping its arguments
 setenv("SOLPS_MPIRUN", "srun")
 
-local netcdf_dir = env_or({"NETCDF_DIR", "CRAY_NETCDF_PREFIX"}, "")
-local hdf5_dir   = env_or({"HDF5_DIR", "CRAY_HDF5_PREFIX"}, "")
-
-if mode() == "load" then
-    if netcdf_dir == "" then
-        LmodWarning(AppName .. ": NETCDF_DIR/CRAY_NETCDF_PREFIX unset, so NCDIR is empty and LD_NETCDF resolves to -L/lib.")
-    end
-    if hdf5_dir == "" then
-        LmodWarning(AppName .. ": HDF5_DIR/CRAY_HDF5_PREFIX unset, so H5DIR is empty.")
-    end
-end
-
-setenv("NCDIR", netcdf_dir)
-setenv("H5DIR", hdf5_dir)
+-- netCDF and HDF5 come from the conda env: cray-hdf5 (HDF5 1.14.3) raises
+-- floating point exceptions while initialising, which aborts debug builds.
+setenv("NCDIR", conda_env_path)
+setenv("H5DIR", conda_env_path)
 
 setenv("HOST_NAME", "NERSC")
 local conda_root = "/global/common/software/nersc/pe/conda/26.1.0/Miniforge3-25.11.0-1/"
@@ -116,8 +90,6 @@ setenv("SOLPSLIB", solpslib)
 
 -- I would really like to avoid these and rather link them in with --rpath but it does not seem easy
 append_path("LD_LIBRARY_PATH", pathJoin(solpslib,"mscl","lib"))
-
-append_path("LD_LIBRARY_PATH", pathJoin(netcdf_dir, "lib"))
 
 append_path("LD_LIBRARY_PATH", pathJoin(conda_env_path, "lib"))
 

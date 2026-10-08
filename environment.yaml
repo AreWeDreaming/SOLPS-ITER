@@ -5,6 +5,11 @@ dependencies:
   # json
   - json-fortran
 
+  # netCDF (HDF5 1.14.3, as in cray-hdf5, raises floating point exceptions
+  # while initialising and aborts debug builds; fixed in 1.14.4)
+  - netcdf-fortran
+  - hdf5 >=1.14.4
+
   # NCAR Command language
   - ncl
   
