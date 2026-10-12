@@ -46,6 +46,9 @@ setenv("F90", "ftn")
 setenv("F77", "ftn")
 setenv("CC", "cc")
 setenv("CXX", "CC")
+-- On Cray the ftn wrapper is also the MPI compiler. SETUP/openmp aborts on an
+-- undefined MPI_FC, and the MPI builds use it to detect the MPI version.
+setenv("MPI_FC", "ftn")
 
 -- b2run -m "mpiexec -n N" swaps the launcher for SOLPS_MPIRUN, keeping its arguments
 setenv("SOLPS_MPIRUN", "srun")
