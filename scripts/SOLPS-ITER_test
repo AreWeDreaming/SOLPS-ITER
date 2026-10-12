@@ -79,8 +79,14 @@ if ($flavor == debug) then
   touch b2fstati
   setup_baserun_B25_links
   echo "'b2mndr_ntim' '10'" >> b2mn.dat
-  b2run -s b2mn
-  ${checks}/run_checks.sh ../16151_1.6MW_2.0e19_D=0.4_chi=1.6_standalone ./ || exit 1
+  b2run -s b2mn |& tee b2run.log
+  # As in SOLPS-ITER_debug_CI_test, the comparison is informational only: this
+  # run stops after 10 steps while the reference ran much longer, so the files
+  # cannot match record by record.
+  ${checks}/run_checks.sh ../16151_1.6MW_2.0e19_D=0.4_chi=1.6_standalone ./
+  # The debug test passes if b2mn reaches its last time step.  b2run cannot
+  # tell, as runs/Makefile ignores the exit status of the executable.
+  grep -q "stopping because itim >= ntim" b2run.log || exit 1
 endif
 
 # Run each case with 1 and N threads, compare both to the reference and to
